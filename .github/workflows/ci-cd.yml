@@ -340,9 +340,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/chaotic-pendulum-dev
-            ${{ secrets.DOCKERHUB_USERNAME }}/chaotic-pendulum-prod
-            ${{ secrets.DOCKERHUB_USERNAME }}/chaotic-pendulum-conda
+            ${{ secrets.DOCKER_USERNAME }}/chaotic-pendulum-dev
+            ${{ secrets.DOCKER_USERNAME }}/chaotic-pendulum-prod
+            ${{ secrets.DOCKER_USERNAME }}/chaotic-pendulum-conda
           tags: |
             type=ref,event=branch
             type=ref,event=pr

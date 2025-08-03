@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN groupadd -r appuser && useradd -r -g appuser -m -d /home/appuser appuser
 
 # Set working directory
 WORKDIR /app
@@ -59,7 +59,8 @@ RUN mkdir -p data/raw data/features data/labeled data/sample_plots \
     student_submissions tests
 
 # Set permissions
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /home/appuser
 
 # Switch to non-root user
 USER appuser
@@ -88,7 +89,8 @@ RUN mkdir -p data/raw data/features data/labeled data/sample_plots \
     student_submissions tests
 
 # Set permissions
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /home/appuser
 
 # Switch to non-root user
 USER appuser
@@ -109,7 +111,7 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 # Create non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN groupadd -r appuser && useradd -r -g appuser -m -d /home/appuser appuser
 
 # Set working directory
 WORKDIR /app
@@ -129,7 +131,8 @@ RUN mkdir -p data/raw data/features data/labeled data/sample_plots \
     student_submissions tests
 
 # Set permissions
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /home/appuser
 
 # Switch to non-root user
 USER appuser
@@ -192,7 +195,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN groupadd -r appuser && useradd -r -g appuser -m -d /home/appuser appuser
 
 # Set working directory
 WORKDIR /app
@@ -211,7 +214,8 @@ RUN mkdir -p data/raw data/features data/labeled data/sample_plots \
     animations models reports/figures
 
 # Set permissions
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /home/appuser
 
 # Switch to non-root user
 USER appuser
