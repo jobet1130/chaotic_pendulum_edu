@@ -11,19 +11,61 @@ __email__ = "jobetcasquejo221@gmail.com"
 __description__ = "Educational project for chaotic pendulum dynamics"
 __url__ = "https://github.com/jobet1130/chaotic_pendulum_edu"
 
-# Core modules
-from . import pendulum
-from . import chaos
-from . import visualization
-from . import analysis
-from . import utils
+# Core modules - import conditionally to handle missing modules
+try:
+    from . import pendulum
+except ImportError:
+    pendulum = None
 
-# Main classes and functions for easy import
-from .pendulum import PendulumSimulator
-from .chaos import ChaosDetector, LyapunovCalculator
-from .visualization import PlotManager, AnimationBuilder
-from .analysis import DataAnalyzer, BifurcationAnalyzer
-from .utils import ConfigManager, DataManager
+try:
+    from . import chaos
+except ImportError:
+    chaos = None
+
+try:
+    from . import visualization
+except ImportError:
+    visualization = None
+
+try:
+    from . import analysis
+except ImportError:
+    analysis = None
+
+try:
+    from . import utils
+except ImportError:
+    utils = None
+
+# Main classes and functions for easy import - import conditionally
+try:
+    from .pendulum import PendulumSimulator
+except ImportError:
+    PendulumSimulator = None
+
+try:
+    from .chaos import ChaosDetector, LyapunovCalculator
+except ImportError:
+    ChaosDetector = None
+    LyapunovCalculator = None
+
+try:
+    from .visualization import PlotManager, AnimationBuilder
+except ImportError:
+    PlotManager = None
+    AnimationBuilder = None
+
+try:
+    from .analysis import DataAnalyzer, BifurcationAnalyzer
+except ImportError:
+    DataAnalyzer = None
+    BifurcationAnalyzer = None
+
+try:
+    from .utils import ConfigManager, DataManager
+except ImportError:
+    ConfigManager = None
+    DataManager = None
 
 # Version info
 __all__ = [
@@ -104,7 +146,22 @@ def initialize_package():
     print(f"Author: {__author__} ({__email__})")
     print(f"Description: {__description__}")
     print(f"URL: {__url__}")
-    print("Package initialized successfully!")
+    
+    # Check module availability
+    modules_status = {
+        "pendulum": pendulum is not None,
+        "chaos": chaos is not None,
+        "visualization": visualization is not None,
+        "analysis": analysis is not None,
+        "utils": utils is not None
+    }
+    
+    print("\nModule Status:")
+    for module, available in modules_status.items():
+        status = "✓ Available" if available else "✗ Not available"
+        print(f"  {module}: {status}")
+    
+    print("\nPackage initialized successfully!")
 
 # Auto-initialize when imported
 if __name__ == "__main__":
