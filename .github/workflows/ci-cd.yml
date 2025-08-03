@@ -182,9 +182,11 @@ jobs:
             make html
           else
             echo "No documentation configuration found"
+            mkdir -p docs/_build/html
           fi
 
       - name: Upload documentation
+        if: ${{ exists('docs/_build/html/index.html')}}
         uses: actions/upload-artifact@v4
         with:
           name: documentation
@@ -202,8 +204,11 @@ jobs:
         with:
           auto-update-conda: true
           python-version: ${{ env.PYTHON_VERSION }}
+          auto-activate-base: false
+          activate-environment: pendulum-chaos-env
 
       - name: Create conda environment
+        shell: bash -l {0}
         run: |
           if [ -f "environment.yml" ]; then
             conda env create -f environment.yml
