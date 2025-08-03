@@ -1,0 +1,260 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chaotic-pendulum-edu"
+dynamic = ["version"]
+description = "A comprehensive educational project for studying chaotic dynamics in driven pendulum systems"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Jobet P. Casquejo", email = "jobetcasquejo221@gmail.com"}
+]
+maintainers = [
+    {name = "Jobet P. Casquejo", email = "jobetcasquejo221@gmail.com"}
+]
+keywords = [
+    "chaos", "pendulum", "dynamics", "education", "physics", 
+    "nonlinear", "simulation", "lyapunov", "bifurcation"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26.4",
+    "scipy>=1.13.1",
+    "pandas>=2.2.2",
+    "matplotlib>=3.9.0",
+    "sympy>=1.12",
+    "nolds>=0.5.2",
+    "scikit-learn>=1.5.0",
+    "seaborn>=0.13.2",
+    "plotly>=5.22.0",
+    "tqdm>=4.66.4",
+    "ipywidgets>=8.1.2",
+    "joblib>=1.4.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-xdist>=3.0.0",
+    "pytest-html>=3.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+jupyter = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.1.8",
+    "ipykernel>=6.29.4",
+    "nbconvert>=7.2.0",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "sphinx-autodoc-typehints>=1.24.0",
+    "myst-parser>=2.0.0",
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "pytest-xdist>=3.0.0",
+    "pytest-html>=3.1.0",
+    "coverage>=7.0.0",
+]
+all = [
+    "chaotic-pendulum-edu[dev,jupyter,docs,test]"
+]
+
+[project.urls]
+Homepage = "https://github.com/jobet1130/chaotic_pendulum_edu"
+Documentation = "https://github.com/jobet1130/chaotic_pendulum_edu#readme"
+Repository = "https://github.com/jobet1130/chaotic_pendulum_edu.git"
+Issues = "https://github.com/jobet1130/chaotic_pendulum_edu/issues"
+Changelog = "https://github.com/jobet1130/chaotic_pendulum_edu/blob/main/CHANGELOG.md"
+
+[project.scripts]
+chaotic-pendulum-sim = "src.cli:main"
+
+[project.gui-scripts]
+chaotic-pendulum-gui = "src.gui:main"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yml", "*.yaml"]
+
+[tool.setuptools.dynamic]
+version = {attr = "src.__version__"}
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src"]
+known_third_party = ["numpy", "scipy", "pandas", "matplotlib", "sympy", "sklearn", "seaborn", "plotly"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+# Flake8 configuration
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503", "E501"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    ".eggs",
+    "*.egg",
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "numpy.*",
+    "scipy.*",
+    "pandas.*",
+    "matplotlib.*",
+    "sympy.*",
+    "sklearn.*",
+    "seaborn.*",
+    "plotly.*",
+    "nolds.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=70",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "chaos: marks tests related to chaos detection",
+    "simulation: marks tests related to pendulum simulation",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]
+
+# Pre-commit configuration
+[tool.pre-commit]
+repos = [
+    {repo = "https://github.com/pre-commit/pre-commit-hooks", rev = "v4.5.0", hooks = [
+        {id = "trailing-whitespace"},
+        {id = "end-of-file-fixer"},
+        {id = "check-yaml"},
+        {id = "check-added-large-files"},
+        {id = "check-merge-conflict"},
+    ]},
+    {repo = "https://github.com/psf/black", rev = "23.12.1", hooks = [{id = "black"}]},
+    {repo = "https://github.com/pycqa/isort", rev = "5.13.2", hooks = [{id = "isort"}]},
+    {repo = "https://github.com/pycqa/flake8", rev = "7.0.0", hooks = [{id = "flake8"}]},
+    {repo = "https://github.com/pre-commit/mirrors-mypy", rev = "v1.8.0", hooks = [
+        {id = "mypy", additional_dependencies = ["types-requests", "types-PyYAML"]},
+    ]},
+]
+
+# Sphinx configuration
+[tool.sphinx]
+project = "Chaotic Pendulum Educational Project"
+copyright = "2024, Jobet P. Casquejo"
+author = "Jobet P. Casquejo"
+version = "0.1.0"
+release = "0.1.0"
+
+# Jupyter configuration
+[tool.jupyter]
+notebook_dir = "notebooks"
+
+
