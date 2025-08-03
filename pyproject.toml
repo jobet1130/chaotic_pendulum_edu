@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chaotic-pendulum-edu"
-dynamic = ["version"]
+version = "0.1.0"
 description = "A comprehensive educational project for studying chaotic dynamics in driven pendulum systems"
 readme = "README.md"
 license = {text = "MIT"}
@@ -104,8 +104,7 @@ packages = ["src"]
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.yml", "*.yaml"]
 
-[tool.setuptools.dynamic]
-version = {attr = "src.__version__"}
+
 
 # Black configuration
 [tool.black]
