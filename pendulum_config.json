@@ -1,0 +1,23 @@
+{
+    "gravity": 9.81,
+    "length": 1.0,
+    "mass": 1.0,
+    "damping": 0.05,
+    "initial_angle": 0.2,
+    "initial_velocity": 0.0,
+    "time_step": 0.01,
+    "total_time": 60.0,
+    "drive_amplitude": 1.2,
+    "drive_frequency": 2.0,
+    "integration_method": "RK4",
+    "chaos_detection": {
+      "lyapunov_method": "rosenstein",
+      "embedding_dimension": 3,
+      "time_delay": 5,
+      "threshold": 0.1
+    },
+    "random_seed": 42,
+    "batch_simulations": 10,
+    "export_format": "csv"
+  }
+  
