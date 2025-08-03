@@ -1,1 +1,300 @@
+name: CI/CD Pipeline
 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [published]
+
+env:
+  PYTHON_VERSION: '3.12'
+  CONDA_ENV: pendulum-chaos-env
+
+jobs:
+  # Linting and Code Quality
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort mypy
+          pip install -r requirements.txt
+
+      - name: Run Black (code formatting check)
+        run: black --check --diff src/ tests/ notebooks/
+
+      - name: Run isort (import sorting check)
+        run: isort --check-only --diff src/ tests/
+
+      - name: Run Flake8 (linting)
+        run: flake8 src/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+
+      - name: Run MyPy (type checking)
+        run: mypy src/ --ignore-missing-imports
+
+  # Unit Tests
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-mock
+
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ --cov=src --cov-report=xml --cov-report=html --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+
+  # Integration Tests
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run integration tests
+        run: |
+          python -c "import sys; print('Python version:', sys.version)"
+          python -c "import numpy; print('NumPy version:', numpy.__version__)"
+          python -c "import scipy; print('SciPy version:', scipy.__version__)"
+          pytest tests/integration/ -v
+
+  # Security Scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install safety
+        run: pip install safety
+
+      - name: Run safety check
+        run: safety check --json --output safety-report.json
+
+      - name: Upload safety report
+        uses: actions/upload-artifact@v3
+        with:
+          name: safety-report
+          path: safety-report.json
+
+  # Documentation Build
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install sphinx sphinx-rtd-theme
+
+      - name: Build documentation
+        run: |
+          if [ -f docs/conf.py ]; then
+            cd docs
+            make html
+          else
+            echo "No documentation configuration found"
+          fi
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: docs/_build/html/
+
+  # Conda Environment Test
+  conda-test:
+    name: Conda Environment Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Conda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Create conda environment
+        run: |
+          conda env create -f environment.yml
+          conda activate ${{ env.CONDA_ENV }}
+
+      - name: Test conda environment
+        run: |
+          conda activate ${{ env.CONDA_ENV }}
+          python -c "import numpy, scipy, pandas, matplotlib, sympy, sklearn, seaborn, plotly; print('All packages imported successfully')"
+
+  # Jupyter Notebook Test
+  notebook-test:
+    name: Test Jupyter Notebooks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nbconvert jupyter
+
+      - name: Test notebooks
+        run: |
+          if [ -d "notebooks" ]; then
+            for notebook in notebooks/*.ipynb; do
+              if [ -f "$notebook" ]; then
+                echo "Testing notebook: $notebook"
+                jupyter nbconvert --to notebook --execute "$notebook" --output-dir /tmp/test_notebooks
+              fi
+            done
+          else
+            echo "No notebooks directory found"
+          fi
+
+  # Build and Package
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: [test, integration, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build setuptools wheel
+
+      - name: Build package
+        run: python -m build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  # Release
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'release'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          release_name: ${{ github.event.release.name }}
+          body: ${{ github.event.release.body }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./dist/*
+          asset_name: ${{ github.event.release.tag_name }}
+          asset_content_type: application/octet-stream
+
+  # Notify on Failure
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [lint, test, integration, security, conda-test, notebook-test]
+    if: failure()
+    steps:
+      - name: Notify failure
+        run: |
+          echo "One or more CI/CD jobs failed!"
+          echo "Please check the GitHub Actions logs for details."
