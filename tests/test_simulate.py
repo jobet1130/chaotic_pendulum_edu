@@ -1,11 +1,12 @@
-import unittest
+import json
 import os
 import shutil
-import json
-import pandas as pd
+import unittest
 from pathlib import Path
 
-from src.simulate import simulate, load_config
+import pandas as pd
+
+from src.simulate import load_config, simulate
 
 
 class TestSimulate(unittest.TestCase):

@@ -1,7 +1,9 @@
-import unittest
 import shutil
-import pandas as pd
+import unittest
 from pathlib import Path
+
+import pandas as pd
+
 from src.features import FeatureBuilder
 
 
