@@ -154,7 +154,7 @@ class ChaosLabeler:
         Args:
             df (pd.DataFrame): Pendulum simulation data.
             column (str): Column name to analyze for chaos.
-            use_correlation_dim (bool): Whether to use correlation dimension as an 
+            use_correlation_dim (bool): Whether to use correlation dimension as an
                 additional indicator.
 
         Returns:
@@ -244,7 +244,7 @@ class ChaosLabeler:
         """Calculate the correlation dimension for a time series.
 
         The correlation dimension is a measure of the dimensionality of the space
-        occupied by a set of points, and is often used to characterize chaotic 
+        occupied by a set of points, and is often used to characterize chaotic
         attractors.
 
         Args:
@@ -323,10 +323,16 @@ class ChaosLabeler:
             # Select a few drive forces to plot
             if "is_chaotic" in df.columns and not df.empty:
                 # Get some chaotic and non-chaotic examples
-                chaotic = df[df["is_chaotic"]]["num__drive_force_c"].unique() if "num__drive_force_c" in df.columns else []
-                non_chaotic = df[~df["is_chaotic"]][
-                    "num__drive_force_c"
-                ].unique() if "num__drive_force_c" in df.columns else []
+                chaotic = (
+                    df[df["is_chaotic"]]["num__drive_force_c"].unique()
+                    if "num__drive_force_c" in df.columns
+                    else []
+                )
+                non_chaotic = (
+                    df[~df["is_chaotic"]]["num__drive_force_c"].unique()
+                    if "num__drive_force_c" in df.columns
+                    else []
+                )
 
                 chaotic_sample = np.random.choice(
                     chaotic, min(2, len(chaotic)), replace=False
