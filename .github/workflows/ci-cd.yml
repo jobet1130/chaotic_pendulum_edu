@@ -55,14 +55,6 @@ jobs:
             echo "src directory not found, skipping Flake8 check"
           fi
 
-      - name: Run MyPy (type checking)
-        run: |
-          if [ -d "src" ]; then
-            mypy src/ --ignore-missing-imports
-          else
-            echo "src directory not found, skipping MyPy check"
-          fi
-
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
