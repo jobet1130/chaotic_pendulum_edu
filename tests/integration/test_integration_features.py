@@ -8,12 +8,14 @@ from src.features import FeatureBuilder
 class TestFeatureBuilder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.test_data = pd.DataFrame({
-            "theta": [0.1, 0.2, 0.3],
-            "omega": [0.01, 0.02, 0.03],
-            "drive_force_c": [0.5, 0.6, 0.7],
-            "category": ["a", "b", "a"]
-        })
+        cls.test_data = pd.DataFrame(
+            {
+                "theta": [0.1, 0.2, 0.3],
+                "omega": [0.01, 0.02, 0.03],
+                "drive_force_c": [0.5, 0.6, 0.7],
+                "category": ["a", "b", "a"],
+            }
+        )
         cls.numerical = ["theta", "omega", "drive_force_c"]
         cls.categorical = ["category"]
         cls.pipeline_path = Path("models/test_pipeline.joblib")

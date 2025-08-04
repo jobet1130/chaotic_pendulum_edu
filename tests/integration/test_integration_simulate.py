@@ -18,7 +18,7 @@ class TestSimulate(unittest.TestCase):
             "initial_angle": 0.2,
             "initial_velocity": 0.0,
             "batch_simulations": 3,
-            "plot_sample": False
+            "plot_sample": False,
         }
         cls.output_dir = Path("data/raw")
         cls.output_file = cls.output_dir / "chaotic_pendulum_simulations.csv"
@@ -52,7 +52,7 @@ class TestSimulate(unittest.TestCase):
             "initial_angle": 0.1,
             "initial_velocity": 0.0,
             "batch_simulations": 2,
-            "plot_sample": False
+            "plot_sample": False,
         }
 
         # Create config file if it doesn't exist

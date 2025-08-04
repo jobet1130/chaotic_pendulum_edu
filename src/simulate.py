@@ -30,11 +30,7 @@ def simulate(config: dict):
     omega0 = config["initial_velocity"]
     initial_conditions = [theta0, omega0]
 
-    c_values = np.linspace(
-        0.5,
-        1.5,
-        config.get("batch_simulations", 10)
-    )
+    c_values = np.linspace(0.5, 1.5, config.get("batch_simulations", 10))
 
     result_dir = Path("data/raw")
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -53,12 +49,9 @@ def simulate(config: dict):
             atol=1e-9,
         )
 
-        df = pd.DataFrame({
-            "t": sol.t,
-            "theta": sol.y[0],
-            "omega": sol.y[1],
-            "drive_force_c": c
-        })
+        df = pd.DataFrame(
+            {"t": sol.t, "theta": sol.y[0], "omega": sol.y[1], "drive_force_c": c}
+        )
 
         all_data.append(df)
 
@@ -67,14 +60,8 @@ def simulate(config: dict):
             and i % config.get("plot_every_n", 100) == 0
         ):
             plt.figure(figsize=(10, 4))
-            plt.plot(
-                sol.t,
-                sol.y[0],
-                label=r"$\theta(t)$"
-            )
-            plt.title(
-                f"Driven Pendulum: c={c:.4f}"
-            )
+            plt.plot(sol.t, sol.y[0], label=r"$\theta(t)$")
+            plt.title(f"Driven Pendulum: c={c:.4f}")
             plt.xlabel("Time")
             plt.ylabel("Angle (rad)")
             plt.grid(True)
@@ -90,11 +77,7 @@ def simulate(config: dict):
 
 
 if __name__ == "__main__":
-    config_path = (
-        sys.argv[1]
-        if len(sys.argv) > 1
-        else "pendulum_config.json"
-    )
+    config_path = sys.argv[1] if len(sys.argv) > 1 else "pendulum_config.json"
     print(f"Loading configuration from: {config_path}")
     config = load_config(config_path)
     simulate(config)

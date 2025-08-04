@@ -40,7 +40,9 @@ class FeatureBuilder:
 
         # Handle OneHotEncoder sparse param based on sklearn version
         if version.parse(sklearn.__version__) >= version.parse("1.2"):
-            one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+            one_hot_encoder = OneHotEncoder(
+                handle_unknown="ignore", sparse_output=False
+            )
         else:
             one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse=False)
 
@@ -86,8 +88,12 @@ class FeatureBuilder:
         except AttributeError:
             # Older sklearn fallback
             num_names = self.numerical_features
-            cat_encoder = self.pipeline.named_transformers_["cat"].named_steps["encoder"]
-            cat_names = list(cat_encoder.get_feature_names_out(self.categorical_features))
+            cat_encoder = self.pipeline.named_transformers_["cat"].named_steps[
+                "encoder"
+            ]
+            cat_names = list(
+                cat_encoder.get_feature_names_out(self.categorical_features)
+            )
             feature_names = num_names + cat_names
 
         transformed_df = pd.DataFrame(transformed_data, columns=feature_names)
@@ -108,7 +114,6 @@ class FeatureBuilder:
         joblib.dump(self.pipeline, path)
         logging.info(f"Pipeline saved to {path}")
         print(f"💾 Pipeline saved to {path}")
-
 
     def load_pipeline(self, path: Path) -> None:
         if not path.exists():
@@ -160,7 +165,9 @@ if __name__ == "__main__":
         exit(1)
 
     numerical = combined_df.select_dtypes(include="number").columns.tolist()
-    categorical = combined_df.select_dtypes(include=["object", "category"]).columns.tolist()
+    categorical = combined_df.select_dtypes(
+        include=["object", "category"]
+    ).columns.tolist()
 
     fb = FeatureBuilder(numerical, categorical)
     fb.fit(combined_df)
