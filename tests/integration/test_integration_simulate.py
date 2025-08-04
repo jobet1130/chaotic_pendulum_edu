@@ -43,6 +43,26 @@ class TestSimulate(unittest.TestCase):
 
         # Check that there is data
         self.assertGreater(len(df), 0, "CSV file is empty.")
+        
+    def test_plot_generation(self):
+        """Test that plots are generated when plot_sample is enabled."""
+        import tempfile
+        from unittest.mock import patch
+        import matplotlib.pyplot as plt
+        
+        # Create a temporary directory for plots
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Configure simulation with plotting enabled
+            plot_config = self.test_config.copy()
+            plot_config["plot_sample"] = True
+            plot_config["plot_dir"] = temp_dir
+            
+            # Patch savefig to verify it's called
+            with patch('matplotlib.pyplot.savefig') as mock_savefig:
+                simulate(plot_config)
+                
+                # Verify that savefig was called at least once
+                self.assertTrue(mock_savefig.called, "No plots were generated")
 
     def test_load_config_file(self):
         config_path = "pendulum_config.json"

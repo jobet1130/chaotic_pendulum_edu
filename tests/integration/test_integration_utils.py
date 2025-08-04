@@ -70,10 +70,75 @@ class TestCSVProcessor(unittest.TestCase):
         self.assertEqual(csv_files, [])
 
         # Ensure it doesn't crash
-        mark_csvs_as_processed(
-            raw_dir=str(self.raw_dir),
-            processed_dir=str(self.processed_dir),
-        )
+        with self.assertLogs(level='INFO') as cm:
+            mark_csvs_as_processed(
+                raw_dir=str(self.raw_dir),
+                processed_dir=str(self.processed_dir),
+            )
+            
+            # Check that appropriate message was logged
+            self.assertTrue(any("No CSV files found" in log for log in cm.output))
+            
+    def test_get_csv_files_nonexistent_directory(self):
+        """Test getting CSV files from a non-existent directory."""
+        # Create a path to a non-existent directory
+        nonexistent_dir = Path(self.temp_dir.name) / "nonexistent"
+        
+        # Get CSV files from non-existent directory
+        with self.assertLogs(level='WARNING') as cm:
+            csv_files = get_csv_files(nonexistent_dir)
+            
+            # Check that a warning was logged
+            self.assertTrue(any("Directory not found" in log for log in cm.output))
+        
+        # Check that an empty list is returned
+        self.assertEqual(len(csv_files), 0)
+        
+    def test_mark_csvs_as_processed_with_overwrite(self):
+        """Test overwriting existing files in the processed directory."""
+        # Create a file in the processed directory with the same name as a raw file
+        processed_file = self.processed_dir / self.sample_files[0].name
+        with open(processed_file, 'w') as f:
+            f.write("original content")
+            
+        # Mark CSVs as processed, which should overwrite the existing file
+        with self.assertLogs(level='WARNING') as cm:
+            mark_csvs_as_processed(
+                raw_dir=str(self.raw_dir),
+                processed_dir=str(self.processed_dir),
+                delete_original=False
+            )
+            
+            # Check that a warning was logged
+            self.assertTrue(any("File will be overwritten" in log for log in cm.output))
+            
+        # Verify the file was overwritten
+        self.assertTrue(processed_file.exists())
+        
+    def test_mark_csvs_as_processed_error_handling(self):
+        """Test error handling in mark_csvs_as_processed."""
+        from unittest.mock import patch
+        
+        # Create test CSV file
+        test_file = self.raw_dir / "error_test.csv"
+        with open(test_file, 'w') as f:
+            f.write("test content")
+        
+        # Mock shutil.copy2 to raise an exception
+        with patch('shutil.copy2', side_effect=Exception("Test error")), \
+             self.assertLogs(level='ERROR') as cm:
+            
+            mark_csvs_as_processed(
+                raw_dir=str(self.raw_dir),
+                processed_dir=str(self.processed_dir),
+                delete_original=True
+            )
+            
+            # Check that error was logged
+            self.assertTrue(any("Error processing" in log for log in cm.output))
+            
+            # Original file should still exist since the copy failed
+            self.assertTrue(test_file.exists())
 
 
 if __name__ == "__main__":
