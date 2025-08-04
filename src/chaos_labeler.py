@@ -154,7 +154,8 @@ class ChaosLabeler:
         Args:
             df (pd.DataFrame): Pendulum simulation data.
             column (str): Column name to analyze for chaos.
-            use_correlation_dim (bool): Whether to use correlation dimension as an additional indicator.
+            use_correlation_dim (bool): Whether to use correlation dimension as an 
+                additional indicator.
 
         Returns:
             pd.DataFrame: DataFrame with chaos labels.
@@ -177,7 +178,8 @@ class ChaosLabeler:
             if use_correlation_dim:
                 corr_dim = self.calculate_correlation_dimension(time_series)
                 logging.info(
-                    f"Correlation dimension for drive force {drive_force:.4f}: {corr_dim:.4f}"
+                    f"Correlation dimension for drive force {drive_force:.4f}: "
+                    f"{corr_dim:.4f}"
                 )
 
             # Determine if chaotic based on Lyapunov exponent and correlation dimension
@@ -216,7 +218,8 @@ class ChaosLabeler:
 
         results_df = pd.DataFrame(results)
         print(
-            f"✅ Chaos detection complete. Found {results_df['is_chaotic'].sum()} chaotic cases."
+            f"✅ Chaos detection complete. Found "
+            f"{results_df['is_chaotic'].sum()} chaotic cases."
         )
 
         # Merge results with original data
@@ -241,7 +244,8 @@ class ChaosLabeler:
         """Calculate the correlation dimension for a time series.
 
         The correlation dimension is a measure of the dimensionality of the space
-        occupied by a set of points, and is often used to characterize chaotic attractors.
+        occupied by a set of points, and is often used to characterize chaotic 
+        attractors.
 
         Args:
             time_series (np.ndarray): Time series data.
@@ -317,12 +321,12 @@ class ChaosLabeler:
         """
         if drive_forces is None:
             # Select a few drive forces to plot
-            if "is_chaotic" in df.columns:
+            if "is_chaotic" in df.columns and not df.empty:
                 # Get some chaotic and non-chaotic examples
-                chaotic = df[df["is_chaotic"] == True]["num__drive_force_c"].unique()
-                non_chaotic = df[df["is_chaotic"] == False][
+                chaotic = df[df["is_chaotic"]]["num__drive_force_c"].unique() if "num__drive_force_c" in df.columns else []
+                non_chaotic = df[~df["is_chaotic"]][
                     "num__drive_force_c"
-                ].unique()
+                ].unique() if "num__drive_force_c" in df.columns else []
 
                 chaotic_sample = np.random.choice(
                     chaotic, min(2, len(chaotic)), replace=False
@@ -381,7 +385,6 @@ class ChaosLabeler:
 
             # 3D Phase Space Plot (if requested)
             if plot_3d and len(subset) > 100:
-                from mpl_toolkits.mplot3d import Axes3D
 
                 # Create time-delayed coordinates for 3D plot
                 delay = self.config["chaos_detection"]["time_delay"]
@@ -513,7 +516,8 @@ def main():
         chaotic_count = unique_forces["is_chaotic"].sum()
         total_count = len(unique_forces)
         print(
-            f"📊 Summary: {chaotic_count} out of {total_count} drive forces exhibit chaotic behavior."
+            f"📊 Summary: {chaotic_count} out of {total_count} drive forces "
+            f"exhibit chaotic behavior."
         )
 
     print("✨ Chaos labeling complete!")

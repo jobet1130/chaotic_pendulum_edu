@@ -316,11 +316,12 @@ def main():
             # Print summary of predictions
             chaotic_count = predictions.sum()
             total_count = len(predictions)
-            print(f"\nPrediction Summary:")
+            print("\nPrediction Summary:")
             print(f"Total samples: {total_count}")
             print(f"Chaotic samples: {chaotic_count} ({chaotic_count/total_count:.2%})")
             print(
-                f"Non-chaotic samples: {total_count - chaotic_count} ({(total_count - chaotic_count)/total_count:.2%})"
+                f"Non-chaotic samples: {total_count - chaotic_count} "
+                f"({(total_count - chaotic_count)/total_count:.2%})"
             )
 
     else:
