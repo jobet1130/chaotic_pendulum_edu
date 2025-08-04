@@ -34,20 +34,21 @@ class TestFeatureBuilder(unittest.TestCase):
         # Expect transformed output to be a DataFrame
         self.assertIsInstance(transformed_df, pd.DataFrame)
         self.assertGreaterEqual(transformed_df.shape[1], len(self.numerical))
-        
+
         # Test transform method with sparse output
+        from unittest.mock import MagicMock, patch
+
         import numpy as np
-        from unittest.mock import patch, MagicMock
-        
-        with patch('pandas.DataFrame') as mock_df:
+
+        with patch("pandas.DataFrame") as mock_df:
             # Configure the mock to simulate sparse output
             mock_transformed_data = MagicMock()
             mock_transformed_data.toarray.return_value = np.array([[1, 2], [3, 4]])
             fb.pipeline.transform = MagicMock(return_value=mock_transformed_data)
-            
+
             # Call transform
             fb.transform(self.test_data)
-            
+
             # Verify toarray was called
             mock_transformed_data.toarray.assert_called_once()
 
