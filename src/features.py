@@ -100,10 +100,16 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Feature engineering pipeline runner.")
     parser.add_argument(
-        "--raw_dir", type=str, required=True, help="Path to directory containing raw CSV files."
+        "--raw_dir",
+        type=str,
+        required=True,
+        help="Path to directory containing raw CSV files.",
     )
     parser.add_argument(
-        "--processed_dir", type=str, required=True, help="Path to directory to save processed CSV files."
+        "--processed_dir",
+        type=str,
+        required=True,
+        help="Path to directory to save processed CSV files.",
     )
     parser.add_argument(
         "--pipeline",
